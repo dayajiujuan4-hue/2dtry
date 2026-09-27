@@ -1,36 +1,42 @@
 "use strict";
 
-const bgm = new Audio("./assets/audio/bgm.mp3");
+const bgm = new Audio("bgm.mp3");
 
 bgm.loop = true;
-bgm.volume = 0.4;
+bgm.volume = 0.5;
 bgm.preload = "auto";
 
-async function startBGM() {
-  try {
-    await bgm.play();
+function startBGM() {
 
-    console.log("BGM再生成功");
-    console.log("BGM:", bgm.src);
+  bgm.play()
+    .then(() => {
 
-    document.removeEventListener("click", startBGM);
-    document.removeEventListener("keydown", startBGM);
+      console.log("♪ BGM再生成功");
 
-  } catch (error) {
-    console.error("BGM再生失敗:", error);
-  }
+    })
+    .catch((error) => {
+
+      console.error(
+        "BGM再生エラー:",
+        error
+      );
+
+    });
+
 }
 
-document.addEventListener("click", startBGM);
-document.addEventListener("keydown", startBGM);
 
-bgm.addEventListener("canplaythrough", () => {
-  console.log("bgm.mp3 読み込み完了");
-});
+// 最初のクリックで再生
+document.addEventListener(
+  "click",
+  startBGM,
+  { once: true }
+);
 
-bgm.addEventListener("error", () => {
-  console.error(
-    "bgm.mp3を読み込めませんでした。",
-    bgm.error
-  );
-});
+
+// または最初のキー入力で再生
+document.addEventListener(
+  "keydown",
+  startBGM,
+  { once: true }
+);
