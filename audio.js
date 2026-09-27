@@ -1,176 +1,36 @@
 "use strict";
 
-/*
-============================================================
- 杭州探索録 - BGM SYSTEM
- 武林夜市 共通BGM
+const bgm = new Audio("./assets/audio/bgm.mp3");
 
- ・全マップ共通
- ・ループ再生
- ・マップ移動しても曲を止めない
- ・最初のプレイヤー操作で再生開始
- ・タブが非表示になっても再生位置を維持
-============================================================
-*/
+bgm.loop = true;
+bgm.volume = 0.4;
+bgm.preload = "auto";
 
+async function startBGM() {
+  try {
+    await bgm.play();
 
-// ============================================================
-// BGM
-// ============================================================
+    console.log("BGM再生成功");
+    console.log("BGM:", bgm.src);
 
-const WULIN_BGM =
-  new Audio("assets/audio/bgm.mp3");
+    document.removeEventListener("click", startBGM);
+    document.removeEventListener("keydown", startBGM);
 
-WULIN_BGM.loop = true;
-
-// 0.0 ～ 1.0
-WULIN_BGM.volume = 0.32;
-
-WULIN_BGM.preload = "auto";
-
-
-// ============================================================
-// STATE
-// ============================================================
-
-let wulinBgmStarted = false;
-
-
-// ============================================================
-// START
-// ============================================================
-
-function startWulinBGM(){
-
-  if(wulinBgmStarted){
-    return;
+  } catch (error) {
+    console.error("BGM再生失敗:", error);
   }
-
-
-  WULIN_BGM.play()
-    .then(()=>{
-
-      wulinBgmStarted = true;
-
-      removeBGMStartListeners();
-
-      console.log(
-        "武林夜市 BGM started"
-      );
-
-    })
-    .catch(()=>{
-
-      /*
-        ブラウザ側で再生を拒否された場合は、
-        次の操作でもう一度試す。
-      */
-
-      wulinBgmStarted = false;
-
-    });
-
 }
 
+document.addEventListener("click", startBGM);
+document.addEventListener("keydown", startBGM);
 
-// ============================================================
-// FIRST USER ACTION
-// ============================================================
+bgm.addEventListener("canplaythrough", () => {
+  console.log("bgm.mp3 読み込み完了");
+});
 
-function bgmKeyHandler(){
-
-  startWulinBGM();
-
-}
-
-
-function bgmPointerHandler(){
-
-  startWulinBGM();
-
-}
-
-
-function bgmTouchHandler(){
-
-  startWulinBGM();
-
-}
-
-
-// ============================================================
-// REMOVE START LISTENERS
-// ============================================================
-
-function removeBGMStartListeners(){
-
-  window.removeEventListener(
-    "keydown",
-    bgmKeyHandler
+bgm.addEventListener("error", () => {
+  console.error(
+    "bgm.mp3を読み込めませんでした。",
+    bgm.error
   );
-
-  window.removeEventListener(
-    "pointerdown",
-    bgmPointerHandler
-  );
-
-  window.removeEventListener(
-    "touchstart",
-    bgmTouchHandler
-  );
-
-}
-
-
-// ============================================================
-// INSTALL LISTENERS
-// ============================================================
-
-window.addEventListener(
-  "keydown",
-  bgmKeyHandler
-);
-
-
-window.addEventListener(
-  "pointerdown",
-  bgmPointerHandler
-);
-
-
-window.addEventListener(
-  "touchstart",
-  bgmTouchHandler
-);
-
-
-// ============================================================
-// TAB RETURN SAFETY
-// ============================================================
-
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-
-    if(
-      !document.hidden &&
-      wulinBgmStarted &&
-      WULIN_BGM.paused
-    ){
-
-      WULIN_BGM.play()
-        .catch(()=>{});
-
-    }
-
-  }
-);
-
-
-// ============================================================
-// DEBUG
-// ============================================================
-
-console.log(
-  "杭州探索録 BGM System loaded"
-);
+});
