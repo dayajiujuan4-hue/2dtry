@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>杭州探索録 - 武林夜市</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+</head>
+
+
+<body>
+
+<main class="game-shell">
+
+
+  <!-- ========================================
+       HEADER
+  ========================================= -->
+
+  <header class="game-header">
+
+    <div>
+
+      <p class="eyebrow">
+        杭州探索録 · HANGZHOU EXPLORER
+      </p>
+
+      <h1>
+        武林夜市
+      </h1>
+
+    </div>
+
+
+    <div class="header-right">
+
+      <span id="rankHeader">
+        夜市见习生
+      </span>
+
+      <span id="areaHeader">
+        武林夜市・小吃街
+      </span>
+
+      <span id="collectionHeader">
+        词语 0 / 100
+      </span>
+
+      <span id="clock">
+        19:42
+      </span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- ========================================
+       GAME
+  ========================================= -->
+
+  <section class="game-frame">
+
+
+    <canvas
+      id="gameCanvas"
+      width="960"
+      height="576"
+    ></canvas>
+
+
+
+    <!-- AREA BANNER -->
+
+    <div
+      id="areaBanner"
+      class="area-banner hidden"
+    >
+
+      <small>
+        AREA
+      </small>
+
+      <strong id="areaBannerName"></strong>
+
+      <span id="areaBannerSub"></span>
+
+    </div>
+
+
+
+    <!-- INTERACTION -->
+
+    <div
+      id="interactionHint"
+      class="interaction-hint hidden"
+    >
+
+      <span class="key">
+        E
+      </span>
+
+      <span id="interactionText">
+        話す
+      </span>
+
+    </div>
+
+
+
+    <!-- DIALOGUE -->
+
+    <div
+      id="dialogueBox"
+      class="dialogue-box hidden"
+    >
+
+      <div class="portrait">
+
+        <div id="portraitFace">
+          人
+        </div>
+
+      </div>
+
+
+      <div class="dialogue-content">
+
+        <div
+          id="speakerName"
+          class="speaker-name"
+        ></div>
+
+
+        <div
+          id="dialogueText"
+          class="dialogue-text"
+        ></div>
+
+
+        <div class="dialogue-footer">
+          E / ENTER
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- WORD GET -->
+
+    <div
+      id="wordGet"
+      class="word-get hidden"
+    >
+
+      <div class="word-get-label">
+        NEW WORD GET!
+      </div>
+
+      <div
+        id="wordGetChinese"
+        class="word-get-chinese"
+      ></div>
+
+      <div
+        id="wordGetPinyin"
+        class="word-get-pinyin"
+      ></div>
+
+      <div
+        id="wordGetMeaning"
+        class="word-get-meaning"
+      ></div>
+
+      <div
+        id="wordGetCategory"
+        class="word-get-category"
+      ></div>
+
+      <div
+        id="wordGetProgress"
+        class="word-get-progress"
+      >
+        1 / 100
+      </div>
+
+      <div class="word-get-close">
+        E / ENTER
+      </div>
+
+    </div>
+
+
+
+    <!-- RANK UP -->
+
+    <div
+      id="rankUpPanel"
+      class="rank-up-panel hidden"
+    >
+
+      <div class="rank-small">
+        NEW TITLE
+      </div>
+
+      <div class="rank-title">
+        称号獲得
+      </div>
+
+      <div
+        id="newRankName"
+        class="new-rank-name"
+      ></div>
+
+      <div class="rank-close">
+        E / ENTER
+      </div>
+
+    </div>
+
+
+
+    <!-- COMPLETION -->
+
+    <div
+      id="completionPanel"
+      class="completion-panel hidden"
+    >
+
+      <div class="completion-glow"></div>
+
+
+      <div class="completion-content">
+
+        <div class="completion-small">
+          HANGZHOU EXPLORER
+        </div>
+
+        <h2>
+          武林夜市制覇！
+        </h2>
+
+        <div class="completion-cn">
+          词语收集完成
+        </div>
+
+        <div class="completion-count">
+          100 / 100
+        </div>
+
+        <div class="completion-divider"></div>
+
+        <p>
+          杭州の夜を歩き、人々と言葉を交わし、<br>
+          街に隠された100の中国語を集めました。
+        </p>
+
+        <div class="completion-title-label">
+          称号
+        </div>
+
+        <div class="completion-title-name">
+          「武林夜市通」
+        </div>
+
+        <div class="completion-unlock">
+          ★ 夜市のどこかで、新たな場所が解放されました
+        </div>
+
+        <div class="completion-close">
+          E / ENTER
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- LIBRARY -->
+
+    <div
+      id="libraryPanel"
+      class="library-panel hidden"
+    >
+
+      <div class="library-window">
+
+
+        <div class="library-top">
+
+          <div>
+
+            <div class="library-eyebrow">
+              HANGZHOU LANGUAGE ARCHIVE
+            </div>
+
+            <h2>
+              词语图鉴
+            </h2>
+
+            <p id="libraryProgress">
+              0 / 100 WORDS
+            </p>
+
+            <p id="libraryRank">
+              称号：夜市见习生
+            </p>
+
+          </div>
+
+
+          <div class="library-controls">
+
+            <span class="key">
+              ← →
+            </span>
+
+            カテゴリー
+
+            <span class="key">
+              ↑ ↓
+            </span>
+
+            選択
+
+            <span class="key">
+              L
+            </span>
+
+            閉じる
+
+          </div>
+
+        </div>
+
+
+
+        <div
+          id="libraryTabs"
+          class="library-tabs"
+        ></div>
+
+
+
+        <div class="library-body">
+
+          <div
+            id="libraryList"
+            class="library-list"
+          ></div>
+
+          <div
+            id="libraryDetail"
+            class="library-detail"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- FADE -->
+
+    <div
+      id="fadeLayer"
+      class="fade-layer"
+    ></div>
+
+
+  </section>
+
+
+
+  <!-- ========================================
+       FOOTER
+  ========================================= -->
+
+  <footer class="game-footer">
+
+    <div>
+
+      <span class="key">
+        WASD
+      </span>
+
+      <span class="key">
+        ↑↓←→
+      </span>
+
+      移動
+
+    </div>
+
+
+    <div>
+
+      <span class="key">
+        E
+      </span>
+
+      話す・調べる・入る
+
+    </div>
+
+
+    <div>
+
+      <span class="key">
+        L
+      </span>
+
+      词语图鉴
+
+    </div>
+
+
+    <div class="footer-location">
+      中国 · 浙江省 · 杭州市
+    </div>
+
+  </footer>
+
+
+</main>
+
+
+
+<!-- ========================================
+     JAVASCRIPT
+
+     読み込み順が重要です
+========================================= -->
+
+<script src="map.js"></script>
+
+<script src="vocabulary.js"></script>
+
+<script src="dialogue.js"></script>
+
+<script src="game.js"></script>
+
+<!--
+  game.js が作った描画関数を
+  最後に visuals.js が拡張する
+-->
+<script src="visuals.js"></script>
+
+
+</body>
+
+</html>
