@@ -2,11 +2,13 @@
 
 /*
 ============================================================
- 杭州探索録 Ver.6
+ 杭州探索録 Ver.6.1
  CHINESE LEARNING SYSTEM
 
  ・屋台で実践中国語
  ・3択会話
+ ・選択肢を毎回シャッフル ← NEW
+ ・正解位置が1・2・3でランダム
  ・間違えても自然に学べる
  ・既存100語と連動
  ・図鑑にリセットボタン追加
@@ -439,11 +441,6 @@ function learn6CreateUI(){
   `;
 
 
-  /*
-    gameCanvasの親要素に配置すると
-    ゲーム画面と重ねやすい。
-  */
-
   const parent=
     canvas.parentElement||
     document.body;
@@ -538,19 +535,6 @@ function learn6CreateUI(){
 // ============================================================
 // EVENTS
 // ============================================================
-
-/*
-  rewardWord は
-  「中国語そのもの」で指定します。
-
-  既存VOCABULARYの100語に
-  その単語が存在する場合のみ、
-  既存の obtainWord() を使用して取得。
-
-  したがって100語を勝手に101語へ
-  増やすことはありません。
-*/
-
 
 const LEARN6_EVENTS=[
 
@@ -775,7 +759,7 @@ const LEARN6_EVENTS=[
 
 
   // ----------------------------------------------------------
-  // PACK
+  // TAKEAWAY
   // ----------------------------------------------------------
 
   {
@@ -909,10 +893,6 @@ function learn6NearbyStall(){
       TILE;
 
 
-    /*
-      屋台正面側
-    */
-
     const sy=
       stall.y*TILE+
       58;
@@ -955,11 +935,6 @@ function learn6EventForStall(data){
   }
 
 
-  /*
-    同じ屋台でも毎回完全ランダムにはせず、
-    マップ＋屋台番号で基本イベントを決定。
-  */
-
   let mapSeed=0;
 
 
@@ -989,6 +964,59 @@ function learn6EventForStall(data){
 
 
 // ============================================================
+// SHUFFLE CHOICES
+// ============================================================
+
+function learn6ShuffleChoices(choices){
+
+  /*
+    元のLEARN6_EVENTSを直接変更しないように
+    新しい配列を作ってからシャッフルする。
+
+    Fisher-Yates方式なので、
+    正解は1・2・3のどこにでも来る。
+  */
+
+  const shuffled=
+    choices.map(
+      choice=>({
+        ...choice
+      })
+    );
+
+
+  for(
+    let i=
+      shuffled.length-1;
+    i>0;
+    i--
+  ){
+
+    const j=
+      Math.floor(
+        Math.random()*
+        (i+1)
+      );
+
+
+    const temp=
+      shuffled[i];
+
+    shuffled[i]=
+      shuffled[j];
+
+    shuffled[j]=
+      temp;
+
+  }
+
+
+  return shuffled;
+
+}
+
+
+// ============================================================
 // START EVENT
 // ============================================================
 
@@ -1002,11 +1030,35 @@ function learn6Start(event){
   clearMovementKeys();
 
 
+  /*
+    イベント本体もコピーする。
+
+    ここでchoicesだけを毎回
+    シャッフルしたものに置き換える。
+
+    correct:true は選択肢自身に
+    付いているので、
+    位置が変わっても正誤判定は壊れない。
+  */
+
+  const shuffledEvent={
+
+    ...event,
+
+    choices:
+      learn6ShuffleChoices(
+        event.choices
+      )
+
+  };
+
+
   LEARN6.active=true;
 
   LEARN6.phase="choice";
 
-  LEARN6.event=event;
+  LEARN6.event=
+    shuffledEvent;
 
   LEARN6.selected=0;
 
@@ -1076,7 +1128,9 @@ function learn6Render(){
   }
 
 
+  // ----------------------------------------------------------
   // CHOICE
+  // ----------------------------------------------------------
 
   if(
     LEARN6.phase==="choice"
@@ -1152,7 +1206,9 @@ function learn6Render(){
   }
 
 
+  // ----------------------------------------------------------
   // RESULT
+  // ----------------------------------------------------------
 
   const choice=
     event.choices[
@@ -1205,6 +1261,12 @@ function learn6Render(){
   }
 
   else{
+
+    /*
+      シャッフル後でも
+      correct:true を探すので、
+      正解が何番に移動していても大丈夫。
+    */
 
     const correct=
       event.choices.find(
@@ -1276,6 +1338,13 @@ function learn6ConfirmChoice(){
       LEARN6.selected
     ];
 
+
+  /*
+    「1番なら正解」ではなく、
+    選んだ選択肢自身のcorrectを確認。
+
+    そのためシャッフル後でも問題なし。
+  */
 
   LEARN6.resultCorrect=
     !!choice.correct;
@@ -1360,6 +1429,17 @@ window.addEventListener(
   event=>{
 
     if(!LEARN6.active){
+      return;
+    }
+
+
+    /*
+      resetDoneは下の専用入力へ任せる。
+    */
+
+    if(
+      LEARN6.phase==="resetDone"
+    ){
       return;
     }
 
@@ -1472,6 +1552,15 @@ window.addEventListener(
         learn6Finish();
 
         return;
+
+      }
+
+
+      if(
+        key==="escape"
+      ){
+
+        learn6Close();
 
       }
 
@@ -1670,10 +1759,6 @@ function learn6InstallResetButton(){
   `;
 
 
-  /*
-    図鑑パネルの中へ追加。
-  */
-
   libraryPanel.appendChild(area);
 
 
@@ -1804,10 +1889,6 @@ function learn6ResetVocabularyStorage(){
     }
 
 
-    /*
-      空配列は判定材料にならない。
-    */
-
     if(
       value.length===0
     ){
@@ -1847,7 +1928,6 @@ function learn6ExecuteReset(){
 
   /*
     現在メモリ上にある収集語を消す。
-    const配列でもspliceなら問題ない。
   */
 
   collectedVocabulary.splice(
@@ -1874,10 +1954,6 @@ function learn6ExecuteReset(){
   pendingRank=null;
 
 
-  /*
-    game.js側の既存保存関数を利用。
-  */
-
   if(
     typeof saveCompletionState===
     "function"
@@ -1889,7 +1965,7 @@ function learn6ExecuteReset(){
 
 
   /*
-    称号比較用状態も更新。
+    称号比較用状態。
   */
 
   previousRank=
@@ -1913,10 +1989,6 @@ function learn6ExecuteReset(){
 
   learn6CloseReset();
 
-
-  /*
-    リセット完了表示。
-  */
 
   learn6ShowResetMessage();
 
@@ -2114,5 +2186,5 @@ learn6InstallResetButton();
 
 
 console.log(
-  "杭州探索録 Ver.6 Chinese Learning System loaded"
+  "杭州探索録 Ver.6.1 Chinese Learning System loaded"
 );
